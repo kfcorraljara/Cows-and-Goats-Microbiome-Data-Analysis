@@ -1,0 +1,380 @@
+---
+  title: "pipeline_automatization"
+output:
+  word_document: default
+pdf_document: default
+html_document: default
+---
+  
+  ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+  
+  
+  #STEP 1..
+  #Differential expression analysis with DESeq2 library 
+  library(DESeq2)
+library(vsn)
+library(pheatmap)
+library(RColorBrewer)
+setwd("~/Desktop/input_output_data_pipeline_cows")
+
+#Input transcriptomic data 
+# un-normalized counts 
+# Upload count matrix input 
+
+RNA_seq_vaches <- read.csv("BGI_vaches_RNA_seq.csv", row.names = 1)
+head(RNA_seq_vaches,2)
+colnames(RNA_seq_vaches) <- c("1612P1", "1612P2", "1612P3", "1612P4", "2046P1", "2046P2", "2046P3", "2046P4", "2175P1", "2175P2", "2175P3", "2175P4", "2179P1", "2179P2", "2179P3", "2179P4")
+
+#Upload the coldata file with information about samples
+#It is absolutely critical that the columns of the count matrix and the rows of the column data (information about samples) are in the same order. 
+
+coldata <- read.csv("coldata_vaches.csv", row.names = 1)
+head(coldata)
+#With the count matrix, RNA_seq_vaches, and the sample information, coldata, we can construct a DESeqDataSet:
+dds <- DESeqDataSetFromMatrix(countData = RNA_seq_vaches,
+                              colData = coldata,
+                              design = ~ condition)
+
+dds
+
+#Differential expression analysis
+# By default, R will choose a reference level for factors based on alphabetical order. 
+
+dds <- DESeq(dds)
+res <- results(dds)
+res
+
+#Note that we could have specified the coefficient or contrast we want to build a results table for, using either of the following equivalent commands:
+res_COS_CTL <- results(dds, contrast=c("condition","COS","CTL"))
+res_COS_CTL
+res_MAP_CTL <- results(dds, contrast=c("condition","MAP","CTL"))
+res_MAP_CTL
+res_HPO_CTL <- results(dds, contrast=c("condition","HPO","CTL"))
+res_HPO_CTL
+res_COS_MAP <- results(dds, contrast=c("condition","COS","MAP"))
+res_COS_MAP
+res_COS_HPO <- results(dds, contrast=c("condition","COS","HPO"))
+res_COS_HPO
+res_MAP_HPO <- results(dds, contrast=c("condition","MAP","HPO"))
+res_MAP_HPO
+
+#Input OTUs data 
+# un-normalized counts 
+# Upload count matrix input 
+
+OTUs_vaches <- read.csv("OTUs_vaches.csv", row.names = NULL)
+rownames(OTUs_vaches) <- make.names(OTUs_vaches[,1], unique = TRUE)
+OTUs_vaches$X <- NULL
+colnames(OTUs_vaches) <- c("1612P1", "1612P2", "1612P3", "1612P4", "2046P1", "2046P2", "2046P3", "2046P4", "2175P1", "2175P2", "2175P3", "2175P4", "2179P1", "2179P2", "2179P3", "2179P4")
+head(OTUs_vaches,2)
+
+#With the count matrix, OTUs_vaches, and the sample information, coldata, we can construct a DESeqDataSet:
+dds_otus <- DESeqDataSetFromMatrix(countData = OTUs_vaches,
+                                   colData = coldata,
+                                   design = ~ condition)
+
+dds_otus
+
+#Differential expression analysis
+# By default, R will choose a reference level for factors based on alphabetical order. 
+
+dds_otus <- DESeq(dds_otus)
+res_otus <- results(dds_otus)
+res_otus
+
+#Note that we could have specified the coefficient or contrast we want to build a results table for, using either of the following equivalent commands:
+res_COS_CTL_OTUs <- results(dds_otus, contrast=c("condition","COS","CTL"))
+res_COS_CTL_OTUs
+res_MAP_CTL_OTUs <- results(dds_otus, contrast=c("condition","MAP","CTL"))
+res_MAP_CTL_OTUs
+res_HPO_CTL_OTUs <- results(dds_otus, contrast=c("condition","HPO","CTL"))
+res_HPO_CTL_OTUs
+res_COS_MAP_OTUs <- results(dds_otus, contrast=c("condition","COS","MAP"))
+res_COS_MAP_OTUs
+res_COS_HPO_OTUs <- results(dds_otus, contrast=c("condition","COS","HPO"))
+res_COS_HPO_OTUs
+res_MAP_HPO_OTUs <- results(dds_otus, contrast=c("condition","MAP","HPO"))
+res_MAP_HPO_OTUs
+
+
+#STEP 2..
+#Co-ocurrence network construction 
+
+#Data preparation 
+res_COS_CTL <- as.data.frame(res_COS_CTL)
+res_COS_CTL_OTUs <- as.data.frame(res_COS_CTL_OTUs)
+res_MAP_CTL <- as.data.frame(res_MAP_CTL)
+res_MAP_CTL_OTUs <- as.data.frame(res_MAP_CTL_OTUs)
+res_HPO_CTL <- as.data.frame(res_HPO_CTL)
+res_HPO_CTL_OTUs <- as.data.frame(res_HPO_CTL_OTUs)
+res_COS_MAP <- as.data.frame(res_COS_MAP)
+res_COS_MAP_OTUs <- as.data.frame(res_COS_MAP_OTUs)
+res_COS_HPO <- as.data.frame(res_COS_HPO)
+res_COS_HPO_OTUs <- as.data.frame(res_COS_HPO_OTUs)
+res_MAP_HPO <- as.data.frame(res_MAP_HPO)
+res_MAP_HPO_OTUs <- as.data.frame(res_MAP_HPO_OTUs)
+
+
+#Selection of KEGGs and OTUs differentially expressed. 
+selection_COS_CTL_DE <- res_COS_CTL[which(res_COS_CTL$padj <= 0.05),]
+selection_COS_CTL_OTUs_DE <- res_COS_CTL_OTUs[which(res_COS_CTL_OTUs$padj <= 0.05),]
+selection_MAP_CTL_DE <- res_MAP_CTL[which(res_MAP_CTL$padj <= 0.05),]
+selection_MAP_CTL_OTUs_DE <- res_MAP_CTL_OTUs[which(res_MAP_CTL_OTUs$padj <= 0.05),]
+selection_HPO_CTL_DE <- res_HPO_CTL[which(res_HPO_CTL$padj <= 0.05),]
+selection_HPO_CTL_OTUs_DE <- res_HPO_CTL_OTUs[which(res_HPO_CTL_OTUs$padj <= 0.05),]
+selection_COS_MAP_DE <- res_COS_MAP[which(res_COS_MAP$padj <= 0.05),]
+selection_COS_MAP_OTUs_DE <- res_COS_MAP_OTUs[which(res_COS_MAP_OTUs$padj <= 0.05),]
+selection_COS_HPO_DE <- res_COS_HPO[which(res_COS_HPO$padj <= 0.05),]
+selection_COS_HPO_OTUs_DE <- res_COS_HPO_OTUs[which(res_COS_HPO_OTUs$padj <= 0.05),]
+selection_MAP_HPO_DE <- res_MAP_HPO[which(res_MAP_HPO$padj <= 0.05),]
+selection_MAP_HPO_OTUs_DE <- res_MAP_HPO_OTUs[which(res_MAP_HPO_OTUs$padj <= 0.05),]
+
+
+#Selection of KEGGs and OTUs DE from original dataframe. 
+KEGGs_selection <- RNA_seq_vaches[ intersect(rownames(RNA_seq_vaches), rownames(selection_COS_CTL_DE)), ]
+OTUs_selection <- OTUs_vaches[ intersect(rownames(OTUs_vaches), rownames(selection_COS_CTL_OTUs_DE)), ]
+
+#Uploading of fermentation parameters dataframe. 
+metabolites <- read.csv("metabolites.csv", row.names = 1)
+colnames(metabolites) <- c("1612P1", "1612P2", "1612P3", "1612P4", "2046P1", "2046P2", "2046P3", "2046P4", "2175P1", "2175P2", "2175P3", "2175P4", "2179P1", "2179P2", "2179P3", "2179P4")
+
+#Union od three dataframes: KEGGs + OTUs + metabolites
+DF_co_ocurrence <- do.call("rbind", list(KEGGs_selection, OTUs_selection, metabolites))
+
+#Co-ocurrence analysis.
+library(ccrepe)
+options(scipen = 999)
+data <- t(DF_co_ocurrence)
+TEST <- ccrepe(
+  x = data,
+  y = NA,
+  sim.score = cor,
+  sim.score.args = list(method = "pearson"),
+  min.subj = 10,
+  iterations = 1000,
+  subset.cols.x = NULL,
+  subset.cols.y = NULL,
+  verbose = FALSE,
+  iterations.gap = 100,
+  distributions = NA,
+  compare.within.x = TRUE,
+  concurrent.output=NA,
+  make.output.table=FALSE)
+
+#Extraction of data from co-ocurrence analysis. 
+dat1 <- which(TEST$sim.score >= abs(0.80), arr.ind = TRUE) 
+comb1 <- data.frame(rn = row.names(TEST$sim.score)[dat1[,1]], cn = colnames(TEST$sim.score) [dat1[,2]])
+dat4 <- which(TEST$q.values < 0.001, arr.ind = TRUE)
+comb4 <- data.frame(rn = row.names(TEST$q.values)[dat4[,1]], cn = colnames(TEST$q.values) [dat4[,2]])
+AB <- do.call(rbind, mget(c("comb1", "comb4")))
+AB$ind <- as.numeric(duplicated(AB))
+selection_network <- AB[which(AB$ind >= 1),]
+selection_network$ind <- NULL
+
+#Network visualization
+#For a better visualization we can use Cytoscape
+library(igraph)
+df.g <- graph.data.frame(d = selection_network, directed = FALSE)
+plot(df.g, vertex.label = V(df.g)$name)
+
+#STEP 3 ..
+#Clustering analysis. 
+#Extraction of unique names from the network 
+unique_col1 <- unique(selection_network$rn)
+unique_col2 <- unique(selection_network$cn)
+unique_both <- intersect(unique_col1, unique_col2)
+different_both <- setdiff(unique_col1, unique_col2)
+unique_both <- as.data.frame(unique_both)
+rownames(unique_both) <- unique_both$unique_both
+
+#Data extraction from original dataframe. 
+data_selection <- DF_co_ocurrence[ intersect(rownames(DF_co_ocurrence), rownames(unique_both)), ]
+
+#Performance of K-means clustering on a dataframe. 
+kmeans <-kmeans(data_selection, 11, nstart = 1)
+kmeans_clusters <- as.data.frame(kmeans$cluster)
+kmeans_clusters$kmeans <- rownames(kmeans_clusters)
+
+
+#STEP 4..
+#Kegg Mapper analysis of each cluster obtained in the previous step. 
+#Data treatment
+library(plyr)
+library(dplyr)
+library(data.table)
+library(KEGGREST)
+
+
+#Pathways, reactions and compounds extraction
+#Data preparation
+colnames(kmeans_clusters) <- c("V7", "kmeans")
+kmeans_selected <- kmeans_clusters[rownames(kmeans_clusters) %like% "K", ]
+kmeans_selected$kmeans <- paste("ko:", kmeans_selected$kmeans, sep = "")
+Kmeans_split1 <- split(kmeans_selected, f = kmeans_selected$V7)
+
+
+#KEGG mapper Reactions extraction
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <- keggLink("reaction", Kmeans_split1[[e]]$kmeans)                  }
+reaction <- ldply(Kmeans_split1, data.frame)
+
+
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <-  names(Kmeans_split1[[e]])                 }
+names_keegs <- ldply(Kmeans_split1, data.frame)
+
+reactions <- cbind(names_keegs, reaction)
+colnames(reactions) <- c("cluster", "keggs", "x",  "reactions")
+reactions <- dplyr::select(reactions, -x, -cluster)
+
+
+#KEGG mapper Compounds extraction
+Kmeans_split1 <- split(kmeans_selected, f = kmeans_selected$V7)
+
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <- keggLink("reaction", Kmeans_split1[[e]]$kmeans)                  }
+
+
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <- keggLink("compound", Kmeans_split1[[e]])                  }
+
+compound <- ldply(Kmeans_split1, data.frame)
+
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <-  names(Kmeans_split1[[e]])                 }
+names_reactions <- ldply(Kmeans_split1, data.frame)
+
+compounds <- cbind(names_reactions, compound)
+colnames(compounds) <- c("cluster1", "reactions", "x",  "compounds")
+compounds <- dplyr::select(compounds, -x, -cluster1)
+
+
+#KEGG mapper Pathways extraction
+Kmeans_split1 <- split(kmeans_selected, f = kmeans_selected$V7)
+
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <- keggLink("reaction", Kmeans_split1[[e]]$kmeans)                  }
+
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <- keggLink("pathway", Kmeans_split1[[e]])                  }
+
+pathway <- ldply(Kmeans_split1, data.frame)
+
+for (e in names(Kmeans_split1)) {                                                                Kmeans_split1[[e]] <-  names(Kmeans_split1[[e]])                 }
+names_reactions1 <- ldply(Kmeans_split1, data.frame)
+
+pathways <- cbind(names_reactions1,pathway )
+colnames(pathways) <- c("cluster2", "reactions", "x",  "pathways")
+pathways <- dplyr::select(pathways, -x, -cluster2)
+pathways <-pathways[- grep("path:rn", pathways$pathways),]
+
+
+#Integration of Reactions, Compounds and pathways Tables.
+table_complet <-Reduce(full_join, list(reactions, compounds, pathways))
+
+colnames(kmeans_selected) <- c("cluster", "keggs")
+table_complet_final <-Reduce(full_join, list(kmeans_selected, table_complet))
+table_complet_final$keggs <-gsub("ko:","",as.character(table_complet_final$keggs))
+
+
+#KEGG mapper count and cluster selection
+#Data preparation
+colnames(kmeans_clusters) <- c("V7", "kmeans")
+kmeans_selected <- kmeans_clusters[rownames(kmeans_clusters) %like% "K", ]
+kmeans_selected$kmeans <- paste("ko:", kmeans_selected$kmeans, sep = "")
+Kmeans_split <- split(kmeans_selected, f = kmeans_selected$V7)
+
+#KEGG mapper analysis
+
+for (e in names(Kmeans_split)) {                                                                Kmeans_split[[e]] <- keggLink("pathway", Kmeans_split[[e]]$kmeans)                  }
+
+for (e in names(Kmeans_split)) {                                                                Kmeans_split[[e]] <- as.data.frame(Kmeans_split[[e]])                  }
+
+for (e in names(Kmeans_split)) {                                                                Kmeans_split[[e]] <- summarise(group_by(Kmeans_split[[e]],`Kmeans_split[[e]]`),count =n())                 }
+
+for (e in names(Kmeans_split)) {                                                                Kmeans_split[[e]] <- Kmeans_split[[e]][which(Kmeans_split[[e]] == "path:map00680"),]             }
+
+df <- ldply(Kmeans_split, data.frame)
+df_selection<-df[df$count == max(df$count),]
+f <- df_selection$.id
+f <- as.data.frame(f)
+rownames(f) <- f$f
+
+#STEP 5..
+#PLS Analysis
+#Data preparation of the cluster of methanogenesis. 
+cluster__final_selection <- kmeans_clusters[is.element(kmeans_clusters$V7,intersect(kmeans_clusters$V7, f$f)),]
+data_Mixomics <- DF_co_ocurrence[ intersect(rownames(DF_co_ocurrence), rownames(cluster__final_selection)), ]
+data_cluster_mixomic <- t(data_Mixomics)
+
+#Data preparation of the rest of the clusters.
+out <- split( kmeans_clusters , f = kmeans_clusters$V7 )
+for (e in names(out)) {                                                                out[[e]] <- DF_co_ocurrence[ intersect(rownames(DF_co_ocurrence), rownames(out[[e]])), ]            }
+
+Tables_clusters <- ldply(out, data.frame)
+
+for (e in names(out)) {                                                                out[[e]] <-  rownames(out[[e]])                 }
+
+Names_Tables_clusters <- ldply(out, data.frame)
+
+Table_mixomics_complete <- cbind(Names_Tables_clusters, Tables_clusters )
+
+
+#Uploading of Y matrices. 
+library(mixOmics)
+CH4 <- read.csv("CH4 .csv", row.names = 1)
+CH4_milk <- read.csv("CH4.milk.csv", row.names = 1)
+CH4_FPCM <- read.csv("CH4.FPCM.csv", row.names = 1)
+CH4_MSI <- read.csv("CH4_MSI.csv", row.names = 1)
+CH4_CO2 <- read.csv("CH4.CO2.csv", row.names = 1)
+
+
+#Previous analysis
+MyResults.pls <- pls(data_cluster_mixomic, CH4, ncomp = 4)
+perf.pls <- perf(MyResults.pls, validation = 'Mfold', folds = 5, progressBar = FALSE, nrepeat = 10)
+plot(perf.pls$Q2.total)
+abline(h=0.0975)
+list.keepX <- c(2:10, 15, 20, 25)
+tune.splls.MAE <- tune.spls(data_cluster_mixomic, CH4, test.keepX = list.keepX, validation = 'Mfold', folds = 5, nrepeat = 10, progressBar = FALSE, measure = 'MAE')
+plot(tune.splls.MAE, legend.position= 'toprigth')
+tune.splls.MAE$choice.keepX
+
+#pls analysis with arguments from previous. 
+pls.CH4 <- pls(data_cluster_mixomic, CH4, ncomp = 3)
+CH4.loadings <- as.data.frame(pls.CH4$loadings$X)
+CH4.loadings.comp1 <- CH4.loadings["comp1"]
+CH4.loadings.comp1$KEGGS <- rownames(CH4.loadings.comp1)
+CH4.loadings.sorted <- CH4.loadings.comp1[sort(abs(CH4.loadings.comp1$comp1),decreasing=T,index.return=T)[[2]],]
+
+
+pls.CH4.milk <- pls(data_cluster_mixomic, CH4_milk, ncomp = 3)
+CH4.milk.loadings <- as.data.frame(pls.CH4.milk$loadings$X)
+CH4.milk.loadings.comp1 <- CH4.milk.loadings["comp1"]
+CH4.milk.loadings.comp1$KEGGS <- rownames(CH4.milk.loadings.comp1)
+CH4.milk.loadings.sorted <- CH4.milk.loadings.comp1[sort(abs(CH4.milk.loadings.comp1$comp1),decreasing=T,index.return=T)[[2]],]
+
+pls.CH4.FPCM <- pls(data_cluster_mixomic, CH4_FPCM, ncomp = 3)
+CH4.FPCM.loadings <- as.data.frame(pls.CH4.FPCM$loadings$X)
+CH4.FPCM.loadings.comp1 <- CH4.FPCM.loadings["comp1"]
+CH4.FPCM.loadings.comp1$KEGGS <- rownames(CH4.FPCM.loadings.comp1)
+CH4.FPCM.loadings.sorted <- CH4.FPCM.loadings.comp1[sort(abs(CH4.FPCM.loadings.comp1$comp1),decreasing=T,index.return=T)[[2]],]
+
+pls.CH4.MSI <- pls(data_cluster_mixomic, CH4_MSI, ncomp = 3)
+CH4.MSI.loadings <- as.data.frame(pls.CH4.MSI$loadings$X)
+CH4.MSI.loadings.comp1 <- CH4.MSI.loadings["comp1"]
+CH4.MSI.loadings.comp1$KEGGS <- rownames(CH4.MSI.loadings.comp1)
+CH4.MSI.loadings.sorted <- CH4.MSI.loadings.comp1[sort(abs(CH4.MSI.loadings.comp1$comp1),decreasing=T,index.return=T)[[2]],]
+
+
+pls.CH4.CO2 <- pls(data_cluster_mixomic, CH4_CO2, ncomp = 3)
+CH4.CO2.loadings <- as.data.frame(pls.CH4.CO2$loadings$X)
+CH4.CO2.loadings.comp1 <- CH4.CO2.loadings["comp1"]
+CH4.CO2.loadings.comp1$KEGGS <- rownames(CH4.CO2.loadings.comp1)
+CH4.CO2.loadings.sorted <- CH4.CO2.loadings.comp1[sort(abs(CH4.CO2.loadings.comp1$comp1),decreasing=T,index.return=T)[[2]],]
+
+#Data merging and output 
+output <-bind_cols(CH4.loadings.sorted, CH4.milk.loadings.sorted, CH4.FPCM.loadings.sorted, CH4.MSI.loadings.sorted, CH4.CO2.loadings.sorted)
+colnames(output) <- c("CH4.comp1", "CH4.KEGGs", "CH4.milk.comp1","CH4.milk.KEGGs","CH4.FPCM.comp1", "CH4.FPCM.KEGGs", "CH4.MSI.comp1", "CH4.MSI.KEGGs" , "CH4.CO2.comp1","CH4.CO2.KEGGs" )
+rownames(output)<-c(1:nrow(output))
+write.csv(as.data.frame(output), file = "output.csv")
