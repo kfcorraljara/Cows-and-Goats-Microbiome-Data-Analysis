@@ -29,9 +29,6 @@ Analyses were performed in:
 - plyr
 - data.table
 
-Package versions are reported in:
-
-sessionInfo.txt
 
 ## Input files
 
