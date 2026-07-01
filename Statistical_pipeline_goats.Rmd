@@ -331,11 +331,11 @@ Table_mixomics_complete <- cbind(Names_Tables_clusters, Tables_clusters )
 
 #Uploading of Y matrices
 library(mixOmics)
-CH4 <- read.csv("CH4.csv", row.names = 1)
-CH4_milk <- read.csv("CH4.milk.csv", row.names = 1)
-CH4_FPCM <- read.csv("CH4.FPMC.csv", row.names = 1)
-CH4_MSI <- read.csv("CH4.MSI.csv", row.names = 1)
-CH4_CO2 <- read.csv("CH4.CO2.csv", row.names = 1)
+CH4 <- read.csv("CH4_goats.csv", row.names = 1)
+CH4_milk <- read.csv("CH4.milk_goats.csv", row.names = 1)
+CH4_FPCM <- read.csv("CH4.FPMC_goats.csv", row.names = 1)
+CH4_MSI <- read.csv("CH4.MSI_goats.csv", row.names = 1)
+CH4_CO2 <- read.csv("CH4.CO2_goats.csv", row.names = 1)
 
 
 #Previous analysis
