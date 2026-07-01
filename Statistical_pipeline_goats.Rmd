@@ -152,7 +152,7 @@ KEGGs_selection <- RNA_seq_chevres[ intersect(rownames(RNA_seq_chevres), rowname
 OTUs_selection <- OTUs_chevres[ intersect(rownames(OTUs_chevres), rownames(selection_COS_CTL_OTUs_DE)), ]
 
 #Uploading of fermentation parameters dataframe. 
-metabolites <- read.csv("metabolites.csv", row.names = 1)
+metabolites <- read.csv("metabolites_goats.csv", row.names = 1)
 colnames(metabolites) <- c("13035P1", "13035P2", "13035P3", "13035P4", "14100P1", "14100P2", "14100P3", "14100P4", "14188P1", "14188P2", "14188P3", "14188P4", "14201P1", "14201P2", "14201P3", "14201P4")
 
 #Union od three dataframes: KEGGs + OTUs + metabolites
