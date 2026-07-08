@@ -6,9 +6,38 @@ setwd("~/Desktop/Cows-and-Goats-Microbiome-Data-Analysis")
 
 #Install R packages 
 
-
+#Deseq2
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("DESeq2")
- 
+
+#vsn
+BiocManager::install("vsn")
+
+#pheatmap
+install.packages("pheatmap")
+
+#RColorBrewer
+install.packages("RColorBrewer")
+
+#ccrepe
+BiocManager::install("ccrepe")
+
+#igraph
+install.packages("igraph")
+
+#plyr
+install.packages("plyr")
+
+#dplyr
+install.packages("dplyr")
+
+#data.table
+install.packages("data.table")
+
+#KEGGREST
+BiocManager::install("KEGGREST")
+
+#mixOmics
+BiocManager::install("mixOmics")
