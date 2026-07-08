@@ -63,6 +63,7 @@ dds <- DESeq(dds)
 res <- results(dds)
 res
 
+
 #Note that we could have specified the coefficient or contrast we want to build a results table for, using either of the following equivalent commands:
 res_COS_CTL <- results(dds, contrast=c("condition","COS","CTL"))
 res_COS_CTL
@@ -76,6 +77,8 @@ res_COS_HPO <- results(dds, contrast=c("condition","COS","HPO"))
 res_COS_HPO
 res_MAP_HPO <- results(dds, contrast=c("condition","MAP","HPO"))
 res_MAP_HPO
+
+
 
 #Input OTUs data 
 # un-normalized counts 
@@ -101,6 +104,7 @@ dds_otus <- DESeq(dds_otus)
 res_otus <- results(dds_otus)
 res_otus
 
+
 #Note that we could have specified the coefficient or contrast we want to build a results table for, using either of the following equivalent commands:
 res_COS_CTL_OTUs <- results(dds_otus, contrast=c("condition","COS","CTL"))
 res_COS_CTL_OTUs
@@ -114,6 +118,7 @@ res_COS_HPO_OTUs <- results(dds_otus, contrast=c("condition","COS","HPO"))
 res_COS_HPO_OTUs
 res_MAP_HPO_OTUs <- results(dds_otus, contrast=c("condition","MAP","HPO"))
 res_MAP_HPO_OTUs
+
 
 
 #STEP 2..
@@ -134,6 +139,7 @@ res_MAP_HPO <- as.data.frame(res_MAP_HPO)
 res_MAP_HPO_OTUs <- as.data.frame(res_MAP_HPO_OTUs)
 
 #Selection of KEGGs and OTUs differentially expressed. 
+##The outputs generated in this section of the script serve as the basis for Supplementary Table 2, Figure 3, and Supplementary Figure 2.
 selection_COS_CTL_DE <- res_COS_CTL[which(res_COS_CTL$padj <= 0.05),]
 selection_COS_CTL_OTUs_DE <- res_COS_CTL_OTUs[which(res_COS_CTL_OTUs$padj <= 0.05),]
 selection_MAP_CTL_DE <- res_MAP_CTL[which(res_MAP_CTL$padj <= 0.05),]
@@ -147,7 +153,7 @@ selection_COS_HPO_OTUs_DE <- res_COS_HPO_OTUs[which(res_COS_HPO_OTUs$padj <= 0.0
 selection_MAP_HPO_DE <- res_MAP_HPO[which(res_MAP_HPO$padj <= 0.05),]
 selection_MAP_HPO_OTUs_DE <- res_MAP_HPO_OTUs[which(res_MAP_HPO_OTUs$padj <= 0.05),]
 
-#Selection of KEGGs and OTUs DE from original dataframe. 
+#Selection of KEGGs and OTUs DE from the original dataframe. 
 KEGGs_selection <- RNA_seq_chevres[ intersect(rownames(RNA_seq_chevres), rownames(selection_COS_CTL_DE)), ]
 OTUs_selection <- OTUs_chevres[ intersect(rownames(OTUs_chevres), rownames(selection_COS_CTL_OTUs_DE)), ]
 
@@ -155,7 +161,7 @@ OTUs_selection <- OTUs_chevres[ intersect(rownames(OTUs_chevres), rownames(selec
 metabolites <- read.csv("metabolites_goats.csv", row.names = 1)
 colnames(metabolites) <- c("13035P1", "13035P2", "13035P3", "13035P4", "14100P1", "14100P2", "14100P3", "14100P4", "14188P1", "14188P2", "14188P3", "14188P4", "14201P1", "14201P2", "14201P3", "14201P4")
 
-#Union od three dataframes: KEGGs + OTUs + metabolites
+#Union of three dataframes: KEGGs + OTUs + metabolites
 DF_co_ocurrence <- do.call("rbind", list(KEGGs_selection, OTUs_selection, metabolites))
 
 #Co-ocurrence analysis.
@@ -179,6 +185,7 @@ TEST <- ccrepe(
     make.output.table=FALSE)
 
 #Extraction of data from co-ocurrence analysis. 
+##The outputs generated in this section of the script serve as the basis for Supplementary Tables 3 and 4, Figure 4 and Supplementary Figure 5. 
 dat1 <- which(TEST$sim.score >= abs(0.80), arr.ind = TRUE) 
 comb1 <- data.frame(rn = row.names(TEST$sim.score)[dat1[,1]], cn = colnames(TEST$sim.score) [dat1[,2]])
 dat4 <- which(TEST$q.values < 0.001, arr.ind = TRUE)
@@ -215,6 +222,7 @@ kmeans_clusters$kmeans <- rownames(kmeans_clusters)
 
 #STEP 4..
 #Kegg Mapper analysis of each cluster obtained in the previous step. 
+##The outputs generated in this section of the script serve as the basis for Supplementary Figure 3 and Supplementary Figure 4. 
 
 library(plyr)
 library(dplyr)
@@ -311,6 +319,9 @@ rownames(f) <- f$f
 
 #STEP 5..
 #pls-da Analysis
+
+##The outputs generated in this section of the script serve as the basis for Figure 5 and Supplementary Table 5. 
+
 #Data treatment. 
 cluster__final_selection <- kmeans_clusters[is.element(kmeans_clusters$V7,intersect(kmeans_clusters$V7, f$f)),]
 data_Mixomics <- DF_co_ocurrence[ intersect(rownames(DF_co_ocurrence), rownames(cluster__final_selection)), ]
