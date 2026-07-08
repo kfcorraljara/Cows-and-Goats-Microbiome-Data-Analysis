@@ -34,7 +34,7 @@ library(DESeq2)
 library(vsn)
 library(pheatmap)
 library(RColorBrewer)
-setwd("~/Desktop/input_output_data_pipeline_goats")
+
 
 #Input transcriptomic data 
 # un-normalized counts 
