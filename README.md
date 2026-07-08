@@ -4,11 +4,7 @@ This repository contains the scripts and input data for the biostatistical analy
 Corral-Jara et al.
 "Species-specific rumen microbial responses to dietary inhibition of methanogenesis in cows and goats"
 
-## Data availability
-
-Raw sequencing data are available at NCBI Sequence Read Archive:
-
-PRJNA762012
+Two.Rmd files can be found in the repository: one for cow analysis (statistical_pipeline_cows.Rmd) and the other for goat analysis (Statistical_pipeline_goats.Rmd).
 
 ## Workflow
 
@@ -25,6 +21,7 @@ The analysis consists of five main steps:
 Analyses were performed in:
 
 - R version 4.4.1.
+The packages required are:
 - DESeq2
 - ccrepe
 - igraph
@@ -34,20 +31,33 @@ Analyses were performed in:
 - plyr
 - data.table
 
+To install all the required packages, please refer to the file Packages_download_data in this repository. 
 
 ## Input files
 
-The following files are required:
+The following input files are required:
 
+Cows:
 - BGI_vaches_RNA_seq.csv
 - OTUs_vaches.csv
 - coldata_vaches.csv
 - metabolites.csv
 - CH4.csv
-- CH4_milk.csv
-- CH4_FPCM.csv
+- CH4.milk.csv
+- CH4.FPCM.csv
 - CH4_MSI.csv
-- CH4_CO2.csv
+- CH4.CO2.csv
+
+Goats:
+- BGI_chevres_RNA_seq.csv
+- OTUs_chevres.csv
+- coldata_chevres.csv
+- metabolites_goats.csv
+- CH4_goats.csv
+- CH4.milk_goats.csv
+- CH4.FPCM_goats.csv
+- CH4_MSI_goats.csv
+- CH4.CO2_goats.csv
 
 ## Output files
 
@@ -57,8 +67,11 @@ The following files are required:
 - kmeans_clusters.csv
 - PLS_loadings.csv
 
+The input and output files associated with each figure are described within the corresponding R Markdown (Rmd) files, where the complete workflow for generating each figure is provided.
 
 
+## Preparation of data and download in RStudio
+To prepare and download the data required for the analysis, please refer to the file "Packages_download_data" in this repository. 
 
 
 
