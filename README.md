@@ -21,7 +21,9 @@ The analysis consists of five main steps:
 Analyses were performed in:
 
 - R version 4.4.1.
-The packages required are:
+
+
+=The packages required are:
 - DESeq2
 - ccrepe
 - igraph
