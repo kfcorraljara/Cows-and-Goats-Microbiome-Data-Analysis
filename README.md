@@ -67,3 +67,10 @@ PRJNA762012
 ## Reproducibility
 
 The repository contains all scripts necessary to reproduce the analyses corresponding to the main figures.
+
+
+## Download the files in your computer
+
+library(git2r)
+clone(url = "https://github.com/kfcorraljara/Cows-and-Goats-Microbiome-Data-Analysis.git", local_path = "Cows-and-Goats-Microbiome-Data-Analysis")
+setwd("~/Desktop/Cows-and-Goats-Microbiome-Data-Analysis")
