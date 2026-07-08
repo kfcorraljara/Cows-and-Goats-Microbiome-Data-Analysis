@@ -32,6 +32,10 @@ Analyses were performed in:
 - dplyr
 - plyr
 - data.table
+- vsn
+- pheatmap
+- RColorBrewer
+
 
 To install all the required packages, please refer to the file Packages_download_data in this repository. 
 
