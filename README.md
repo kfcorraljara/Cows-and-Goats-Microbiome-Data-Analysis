@@ -1,9 +1,14 @@
 # Cows-and-Goats-Microbiome-Data-Analysis
-This repository contains the scripts used in:
+This repository contains the scripts and input data for the biostatistical analysis used in:
 
 Corral-Jara et al.
 "Species-specific rumen microbial responses to dietary inhibition of methanogenesis in cows and goats"
 
+## Data availability
+
+Raw sequencing data are available at NCBI Sequence Read Archive:
+
+PRJNA762012
 
 ## Workflow
 
@@ -34,8 +39,6 @@ Analyses were performed in:
 
 The following files are required:
 
-data/
-
 - BGI_vaches_RNA_seq.csv
 - OTUs_vaches.csv
 - coldata_vaches.csv
@@ -48,29 +51,19 @@ data/
 
 ## Output files
 
-results/
-
 - deKOs_COS_CTL.csv
 - deOTUs_COS_CTL.csv
 - network_edges.csv
 - kmeans_clusters.csv
 - PLS_loadings.csv
 
-## Data availability
 
-Raw sequencing data are available at NCBI Sequence Read Archive:
 
-PRJNA762012
 
-(Replace with the final accession number.)
-
-## Reproducibility
-
-The repository contains all scripts necessary to reproduce the analyses corresponding to the main figures.
 
 
 ## Download the files in your computer
 
-library(git2r)
-clone(url = "https://github.com/kfcorraljara/Cows-and-Goats-Microbiome-Data-Analysis.git", local_path = "Cows-and-Goats-Microbiome-Data-Analysis")
-setwd("~/Desktop/Cows-and-Goats-Microbiome-Data-Analysis")
+-library(git2r)
+-clone(url = "https://github.com/kfcorraljara/Cows-and-Goats-Microbiome-Data-Analysis.git", local_path = "Cows-and-Goats-Microbiome-Data-Analysis")
+-setwd("~/Desktop/Cows-and-Goats-Microbiome-Data-Analysis")
