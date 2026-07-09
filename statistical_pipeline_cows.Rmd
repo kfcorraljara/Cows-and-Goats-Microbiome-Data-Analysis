@@ -124,6 +124,7 @@ res_MAP_HPO_OTUs <- as.data.frame(res_MAP_HPO_OTUs)
 
 
 #Selection of KEGGs and OTUs differentially expressed. 
+##The outputs generated in this section of the script serve as the basis for Supplementary Table 2, Figure 3, and Supplementary Figure 2.
 selection_COS_CTL_DE <- res_COS_CTL[which(res_COS_CTL$padj <= 0.05),]
 selection_COS_CTL_OTUs_DE <- res_COS_CTL_OTUs[which(res_COS_CTL_OTUs$padj <= 0.05),]
 selection_MAP_CTL_DE <- res_MAP_CTL[which(res_MAP_CTL$padj <= 0.05),]
@@ -170,6 +171,7 @@ TEST <- ccrepe(
     make.output.table=FALSE)
 
 #Extraction of data from co-ocurrence analysis. 
+##The outputs generated in this section of the script serve as the basis for Supplementary Tables 3 and 4, Figure 4 and Supplementary Figure 5. 
 dat1 <- which(TEST$sim.score >= abs(0.80), arr.ind = TRUE) 
 comb1 <- data.frame(rn = row.names(TEST$sim.score)[dat1[,1]], cn = colnames(TEST$sim.score) [dat1[,2]])
 dat4 <- which(TEST$q.values < 0.001, arr.ind = TRUE)
@@ -180,7 +182,7 @@ selection_network <- AB[which(AB$ind >= 1),]
 selection_network$ind <- NULL
 
 #Network visualization
-#For a better visualization we can use Cytoscape
+#For a better visualization, we used Cytoscape
 library(igraph)
 df.g <- graph.data.frame(d = selection_network, directed = FALSE)
 plot(df.g, vertex.label = V(df.g)$name)
@@ -206,6 +208,7 @@ kmeans_clusters$kmeans <- rownames(kmeans_clusters)
 
 #STEP 4..
 #Kegg Mapper analysis of each cluster obtained in the previous step. 
+##The outputs generated in this section of the script serve as the basis for Supplementary Figure 3 and Supplementary Figure 4. 
 #Data treatment
 library(plyr)
 library(dplyr)
@@ -303,7 +306,9 @@ rownames(f) <- f$f
 
 #STEP 5..
 #PLS Analysis
-#Data preparation of the cluster of methanogenesis. 
+##The outputs generated in this section of the script serve as the basis for Figure 5 and Supplementary Table 5. 
+
+#Data treatment. 
 cluster__final_selection <- kmeans_clusters[is.element(kmeans_clusters$V7,intersect(kmeans_clusters$V7, f$f)),]
 data_Mixomics <- DF_co_ocurrence[ intersect(rownames(DF_co_ocurrence), rownames(cluster__final_selection)), ]
 data_cluster_mixomic <- t(data_Mixomics)
