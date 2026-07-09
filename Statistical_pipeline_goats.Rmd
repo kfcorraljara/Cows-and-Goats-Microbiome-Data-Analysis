@@ -196,7 +196,7 @@ selection_network <- AB[which(AB$ind >= 1),]
 selection_network$ind <- NULL
 
 #Network visualization
-#For a better visualization we can use Cytoscape
+#For a better visualization, we used Cytoscape
 library(igraph)
 df.g <- graph.data.frame(d = selection_network, directed = FALSE)
 plot(df.g, vertex.label = V(df.g)$name)
