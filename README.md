@@ -24,17 +24,17 @@ Analyses were performed in:
 
 
 =The packages required are:
-- DESeq2
-- ccrepe
-- igraph
-- mixOmics
-- KEGGREST
-- dplyr
-- plyr
-- data.table
-- vsn
-- pheatmap
-- RColorBrewer
+- DESeq2 v1.44.0
+- ccrepe v1.40.0
+- igraph v2.3.2
+- mixOmics v6.28.0
+- KEGGREST v1.44.1
+- dplyr v1.2.1
+- plyr v1.8.9
+- data.table v1.18.4
+- vsn v3.72.0
+- pheatmap v1.0.13
+- RColorBrewer v1.1.3
 
 
 To install all required packages, please refer to the Packages_download_data file in this repository. 
