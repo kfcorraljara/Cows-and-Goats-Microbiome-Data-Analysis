@@ -84,7 +84,7 @@ res_MAP_HPO
 # un-normalized counts 
 # Upload count matrix input 
 
-OTUs_chevres <- read.csv("OTUs_chevres.csv", row.names = NULL)
+OTUs_chevres <- read.csv("OTUS_chevres.csv", row.names = NULL)
 rownames(OTUs_chevres) <- make.names(OTUs_chevres[,1], unique = TRUE)
 OTUs_chevres$X <- NULL
 colnames(OTUs_chevres) <- c("13035P1", "13035P2", "13035P3", "13035P4", "14100P1", "14100P2", "14100P3", "14100P4", "14188P1", "14188P2", "14188P3", "14188P4", "14201P1", "14201P2", "14201P3", "14201P4")
@@ -396,4 +396,4 @@ CH4.CO2.loadings.sorted <- CH4.CO2.loadings.comp1[sort(abs(CH4.CO2.loadings.comp
 output <-bind_cols(CH4.loadings.sorted, CH4.milk.loadings.sorted, CH4.FPCM.loadings.sorted, CH4.MSI.loadings.sorted, CH4.CO2.loadings.sorted)
 colnames(output) <- c("CH4.comp1", "CH4.KEGGs", "CH4.milk.comp1","CH4.milk.KEGGs","CH4.FPCM.comp1", "CH4.FPCM.KEGGs", "CH4.MSI.comp1", "CH4.MSI.KEGGs" , "CH4.CO2.comp1","CH4.CO2.KEGGs" )
 rownames(output)<-c(1:nrow(output))
-write.csv(as.data.frame(output), file = "output.csv")
+write.csv(as.data.frame(output), file = "output_goats.csv")
