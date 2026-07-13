@@ -338,10 +338,10 @@ CH4_CO2 <- read.csv("CH4.CO2.csv", row.names = 1)
 #Previous analysis
 MyResults.pls <- pls(data_cluster_mixomic, CH4, ncomp = 4)
 perf.pls <- perf(MyResults.pls, validation = 'Mfold', folds = 5, progressBar = FALSE, nrepeat = 10)
-plot(perf.pls$Q2.total)
+plot(perf.pls$measures$Q2.total$values$comp, perf.pls$measures$Q2.total$values$value, type = "b", xlab = "Components", ylab = "Q2 total")
 abline(h=0.0975)
 list.keepX <- c(2:10, 15, 20, 25)
-tune.splls.MAE <- tune.spls(data_cluster_mixomic, CH4, test.keepX = list.keepX, validation = 'Mfold', folds = 5, nrepeat = 10, progressBar = FALSE, measure = 'MAE')
+tune.splls.MAE <- tune.spls(data_cluster_mixomic, CH4, test.keepX = list.keepX, validation = 'Mfold', folds = 5, nrepeat = 10, progressBar = FALSE, measure = 'MAE', ncomp=3)
 plot(tune.splls.MAE, legend.position= 'toprigth')
 tune.splls.MAE$choice.keepX
 
